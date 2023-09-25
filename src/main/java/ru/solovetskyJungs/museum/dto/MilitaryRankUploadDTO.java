@@ -1,4 +1,4 @@
 package ru.solovetskyJungs.museum.dto;
 
-public record MilitaryRankUploadDTO(String title, String imageDescription) {
+public record MilitaryRankUploadDTO(String title) {
 }

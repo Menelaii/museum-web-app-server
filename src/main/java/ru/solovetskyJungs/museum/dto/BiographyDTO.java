@@ -16,6 +16,6 @@ public record BiographyDTO(
         List<MilitaryRankDetailsDTO> militaryRankDetails,
         List<CareerDetailsDTO> militaryServiceDetails,
         List<CareerDetailsDTO> employmentHistory,
-        List<FileAttachmentDTO> images,
+        List<ImageAttachmentDTO> images,
         FileAttachmentDTO presentation) {
 }

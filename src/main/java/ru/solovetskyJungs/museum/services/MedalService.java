@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.solovetskyJungs.museum.entities.FileAttachment;
 import ru.solovetskyJungs.museum.entities.Medal;
+import ru.solovetskyJungs.museum.entities.projections.MedalProjection;
 import ru.solovetskyJungs.museum.repositories.MedalRepository;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +26,8 @@ public class MedalService {
     }
 
     @Transactional
-    public void create(Medal medal, MultipartFile image, String imageDescription) throws IOException {
-        FileAttachment fileAttachment = fileAttachmentService.saveFile(image, imageDescription);
+    public void create(Medal medal, MultipartFile image) {
+        FileAttachment fileAttachment = fileAttachmentService.saveFile(image);
         medal.setImage(fileAttachment);
         repository.save(medal);
     }
@@ -46,5 +46,13 @@ public class MedalService {
 
     public Optional<Medal> getById(Long medalId) {
         return repository.findById(medalId);
+    }
+
+    public List<String> getTitles() {
+        return repository.findTitles();
+    }
+
+    public List<MedalProjection> getAllWithShortSelect() {
+        return repository.findAllWithShortSelect();
     }
 }

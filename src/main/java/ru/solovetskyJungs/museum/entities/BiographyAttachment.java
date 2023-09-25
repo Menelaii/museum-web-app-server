@@ -12,6 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BiographyAttachment extends AbstractEntity {
+    private boolean isPreview;
+
     @ManyToOne
     @JoinColumn(name = "biography_id", referencedColumnName = "id")
     private Biography biography;

@@ -3,6 +3,8 @@ package ru.solovetskyJungs.museum.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.solovetskyJungs.museum.enums.ArtifactType;
+import ru.solovetskyJungs.museum.enums.ValueCategory;
 
 import java.time.LocalDate;
 import java.util.List;

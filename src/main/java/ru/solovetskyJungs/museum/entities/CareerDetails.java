@@ -1,10 +1,9 @@
 package ru.solovetskyJungs.museum.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.solovetskyJungs.museum.enums.CareerType;
 
 import java.time.LocalDate;
 
@@ -16,6 +15,9 @@ public class CareerDetails extends AbstractEntity {
     private String position;
     private LocalDate startDate;
     private LocalDate endDate;
+
+    @Enumerated(EnumType.ORDINAL)
+    private CareerType careerType;
 
     @ManyToOne
     @JoinColumn(name = "biography_id", referencedColumnName = "id")

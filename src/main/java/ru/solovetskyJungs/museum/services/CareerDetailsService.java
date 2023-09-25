@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.solovetskyJungs.museum.entities.Biography;
 import ru.solovetskyJungs.museum.entities.CareerDetails;
+import ru.solovetskyJungs.museum.enums.CareerType;
 import ru.solovetskyJungs.museum.repositories.CareerDetailsRepository;
 
 import java.util.List;
@@ -21,8 +22,7 @@ public class CareerDetailsService {
     @Transactional
     public CareerDetails createCareerDetails(CareerDetails careerDetails) {
         Biography biography = biographiesService
-                .getById(careerDetails.getBiography().getId())
-                .orElseThrow(EntityNotFoundException::new);
+                .getById(careerDetails.getBiography().getId());
 
         careerDetails.setBiography(biography);
 
@@ -40,5 +40,9 @@ public class CareerDetailsService {
 
     public Optional<CareerDetails> getById(Long id) {
         return repository.findById(id);
+    }
+
+    public List<String> getPlacesOfService() {
+        return repository.findPlacesOfService(CareerType.MILITARY_SERVICE);
     }
 }

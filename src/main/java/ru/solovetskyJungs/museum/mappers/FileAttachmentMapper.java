@@ -3,10 +3,12 @@ package ru.solovetskyJungs.museum.mappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.solovetskyJungs.museum.dto.ImageAttachmentDTO;
 import ru.solovetskyJungs.museum.dto.FileAttachmentDTO;
+import ru.solovetskyJungs.museum.entities.ArtifactAttachment;
+import ru.solovetskyJungs.museum.entities.BiographyAttachment;
 import ru.solovetskyJungs.museum.entities.FileAttachment;
 
-import java.io.File;
 import java.nio.file.Path;
 
 @Component
@@ -17,9 +19,29 @@ public class FileAttachmentMapper {
     private String backendURL;
 
     public FileAttachmentDTO map(FileAttachment fileAttachment) {
+        if (fileAttachment == null) {
+            return null;
+        }
+
         return new FileAttachmentDTO(
-                pathToURL(fileAttachment.getUri()),
-                fileAttachment.getDescription()
+                fileAttachment.getId(),
+                pathToURL(fileAttachment.getUri())
+        );
+    }
+
+    public ImageAttachmentDTO map(ArtifactAttachment attachment) {
+        return new ImageAttachmentDTO(
+                attachment.getId(),
+                pathToURL(attachment.getFileAttachment().getUri()),
+                attachment.isPreview()
+        );
+    }
+
+    public ImageAttachmentDTO map(BiographyAttachment attachment) {
+        return new ImageAttachmentDTO(
+                attachment.getId(),
+                pathToURL(attachment.getFileAttachment().getUri()),
+                attachment.isPreview()
         );
     }
 

@@ -12,6 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArtifactAttachment extends AbstractEntity {
+    private boolean isPreview;
+
     @ManyToOne
     @JoinColumn(name = "artifact_id", referencedColumnName = "id")
     private Artifact artifact;

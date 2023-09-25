@@ -7,11 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.solovetskyJungs.museum.entities.FileAttachment;
 import ru.solovetskyJungs.museum.entities.MilitaryRank;
+import ru.solovetskyJungs.museum.entities.projections.MilitaryRankProjection;
 import ru.solovetskyJungs.museum.repositories.MilitaryRankRepository;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +24,14 @@ public class MilitaryRankService {
         return repository.findAll();
     }
 
+    public MilitaryRank getById(Long rankId) {
+        return repository.findById(rankId)
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
     @Transactional
-    public void save(MilitaryRank militaryRank,
-                     MultipartFile image,
-                     String imageDescription) throws IOException {
-        FileAttachment attachment = fileAttachmentService.saveFile(image, imageDescription);
+    public void save(MilitaryRank militaryRank, MultipartFile image) {
+        FileAttachment attachment = fileAttachmentService.saveFile(image);
         militaryRank.setImage(attachment);
         repository.save(militaryRank);
     }
@@ -44,7 +46,11 @@ public class MilitaryRankService {
         repository.delete(militaryRankToDelete);
     }
 
-    public Optional<MilitaryRank> getById(Long rankId) {
-        return repository.findById(rankId);
+    public List<String> getTitles() {
+        return repository.findTitles();
+    }
+
+    public List<MilitaryRankProjection> getAllWithShortSelect() {
+        return repository.findAllWithShortSelect();
     }
 }

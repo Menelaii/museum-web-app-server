@@ -16,6 +16,17 @@ public class BiographyMapper {
     private final MilitaryRankMapper militaryRankMapper;
     private final FileAttachmentMapper fileAttachmentMapper;
 
+    public BiographyShortDTO mapToShort(Biography biography) {
+        return new BiographyShortDTO(
+          biography.getId(),
+          biography.getSurname(),
+          biography.getName(),
+          biography.getPatronymic(),
+          biography.getBirthDate(),
+          biography.getDateOfDeath()
+        );
+    }
+
     public BiographyDTO map(Biography biography) {
         return new BiographyDTO(
                 biography.getId(),
@@ -44,7 +55,7 @@ public class BiographyMapper {
                         .toList(),
                 biography.getImages()
                         .stream()
-                        .map(this::toFileAttachmentDTO)
+                        .map(this::toImageAttachmentDTO)
                         .toList(),
                 fileAttachmentMapper.map(biography.getPresentation())
         );
@@ -105,7 +116,7 @@ public class BiographyMapper {
         return modelMapper.map(careerDetails, CareerDetailsDTO.class);
     }
 
-    private FileAttachmentDTO toFileAttachmentDTO(BiographyAttachment biographyAttachment) {
-        return fileAttachmentMapper.map(biographyAttachment.getFileAttachment());
+    private ImageAttachmentDTO toImageAttachmentDTO(BiographyAttachment biographyAttachment) {
+        return fileAttachmentMapper.map(biographyAttachment);
     }
 }

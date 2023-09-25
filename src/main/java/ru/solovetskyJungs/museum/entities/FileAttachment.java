@@ -1,7 +1,6 @@
 package ru.solovetskyJungs.museum.entities;
 
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,8 +9,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class FileAttachment extends AbstractEntity {
     private String uri;
-    private String description;
+
+    public FileAttachment(Long id, String uri) {
+        super(id);
+        this.uri = uri;
+    }
+
+    public FileAttachment(String uri) {
+        this.uri = uri;
+    }
 }

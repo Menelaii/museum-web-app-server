@@ -24,9 +24,7 @@ public class MilitaryRankDetailsService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public MilitaryRankDetails save(MilitaryRankDetails details) {
-        MilitaryRank militaryRank = militaryRankService
-                        .getById(details.getRank().getId())
-                        .orElseThrow(EntityNotFoundException::new);
+        MilitaryRank militaryRank = militaryRankService.getById(details.getRank().getId());
 
         MilitaryRankDetails entity = repository.save(details);
         entity.setRank(militaryRank);
