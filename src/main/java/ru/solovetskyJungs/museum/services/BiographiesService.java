@@ -10,10 +10,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.solovetskyJungs.museum.models.entities.Biography;
-import ru.solovetskyJungs.museum.models.entities.BiographyAttachment;
-import ru.solovetskyJungs.museum.models.entities.FileAttachment;
+import ru.solovetskyJungs.museum.models.entities.*;
 import ru.solovetskyJungs.museum.models.enums.CareerType;
+import ru.solovetskyJungs.museum.repositories.BiographyAttachmentRepository;
 import ru.solovetskyJungs.museum.repositories.BiographyRepository;
 import ru.solovetskyJungs.museum.repositories.CareerDetailsRepository;
 import ru.solovetskyJungs.museum.searchCriterias.BiographySearchCriteria;
@@ -30,6 +29,7 @@ public class BiographiesService {
     private final BiographyRepository repository;
     private final FileAttachmentsService fileAttachmentsService;
     private final CareerDetailsRepository careerDetailsRepository;
+    private final BiographyAttachmentRepository attachmentsRepository;
 
     public Biography getById(Long biographyId) {
         Biography biography = repository.findById(biographyId)
@@ -155,12 +155,18 @@ public class BiographiesService {
     }
 
     @Transactional
-    public void addImage(Long id, MultipartFile image) {
+    public void addImage(Long id, MultipartFile image, Boolean isPreview) {
         Biography biography = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
+        isPreview = isPreview != null ? isPreview : false;
+        if (isPreview) {
+            BiographyAttachment oldPreview = findPreview(biography);
+            attachmentsRepository.unsetAsPreview(oldPreview.getId());
+        }
+
         FileAttachment fileAttachment = fileAttachmentsService.saveFile(image);
-        BiographyAttachment imageAttachment = new BiographyAttachment(false, biography, fileAttachment);
+        BiographyAttachment imageAttachment = new BiographyAttachment(isPreview, biography, fileAttachment);
 
         biography.getImages().add(imageAttachment);
 
@@ -185,30 +191,29 @@ public class BiographiesService {
     }
 
     @Transactional
-    public void changePreview(Long id, MultipartFile preview) {
+    public void changePreview(Long id, Long imageId) {
         Biography biography = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
-        BiographyAttachment oldPreview = biography.getImages()
-                .stream()
-                .filter(BiographyAttachment::isPreview)
-                .findFirst()
-                .orElse(null);
-
-        if (oldPreview != null) {
-            biography.getImages().remove(oldPreview);
-            oldPreview.setBiography(null);
-            fileAttachmentsService.delete(oldPreview.getFileAttachment());
+        if (attachmentsRepository.existsById(imageId)) {
+            throw new EntityNotFoundException();
         }
 
-        FileAttachment fileAttachment = fileAttachmentsService.saveFile(preview);
-        biography.getImages().add(new BiographyAttachment(
-                true,
-                biography,
-                fileAttachment
-        ));
+        BiographyAttachment oldPreview = findPreview(biography);
+        if (oldPreview != null) {
+            attachmentsRepository.unsetAsPreview(oldPreview.getId());
+        }
+
+        attachmentsRepository.setAsPreview(imageId);
 
         repository.save(biography);
+    }
+
+    public BiographyAttachment findPreview(Biography biography) {
+        return biography.getImages().stream()
+                .filter(BiographyAttachment::isPreview)
+                .findFirst()
+                .orElseThrow(EntityNotFoundException::new);
     }
 
 

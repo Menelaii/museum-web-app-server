@@ -80,8 +80,10 @@ public class BiographiesController {
 
     @PostMapping("/{id}/add-image")
     public ResponseEntity<Void> addImage(@PathVariable Long id,
-                                         @RequestBody MultipartFile image) {
-        service.addImage(id, image);
+                                         @RequestBody MultipartFile image,
+                                         @RequestParam Boolean isPreview
+    ) {
+        service.addImage(id, image, isPreview);
         return ResponseEntity.ok().build();
     }
 
@@ -94,8 +96,8 @@ public class BiographiesController {
 
     @PatchMapping("/{id}/change-preview")
     public ResponseEntity<Void> changePreview(@PathVariable Long id,
-                                              @RequestBody MultipartFile preview) {
-        service.changePreview(id, preview);
+                                              @RequestParam Long imageId) {
+        service.changePreview(id, imageId);
         return ResponseEntity.ok().build();
     }
 }

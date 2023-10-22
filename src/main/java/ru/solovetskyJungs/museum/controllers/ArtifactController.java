@@ -76,16 +76,17 @@ public class ArtifactController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> changePreview(@PathVariable Long id,
-                                              @RequestBody MultipartFile preview
+                                              @RequestParam Long imageId
     ) {
-        service.changePreview(id, preview);
+        service.changePreview(id, imageId);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/add-image")
     public ResponseEntity<Void> addImage(@PathVariable Long id,
-                                         @RequestParam("image") MultipartFile image) {
-        service.addImage(id, image);
+                                         @RequestBody MultipartFile image,
+                                         @RequestParam Boolean isPreview) {
+        service.addImage(id, image, isPreview);
         return ResponseEntity.ok().build();
     }
 

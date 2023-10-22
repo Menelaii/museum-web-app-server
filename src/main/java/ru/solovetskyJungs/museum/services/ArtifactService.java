@@ -15,6 +15,7 @@ import ru.solovetskyJungs.museum.models.entities.ArtifactAttachment;
 import ru.solovetskyJungs.museum.models.entities.FileAttachment;
 import ru.solovetskyJungs.museum.models.enums.ArtifactType;
 import ru.solovetskyJungs.museum.models.enums.ValueCategory;
+import ru.solovetskyJungs.museum.repositories.ArtifactAttachmentRepository;
 import ru.solovetskyJungs.museum.repositories.ArtifactRepository;
 import ru.solovetskyJungs.museum.searchCriterias.ArtifactsSearchCriteria;
 import ru.solovetskyJungs.museum.searchCriterias.XPage;
@@ -30,6 +31,7 @@ public class ArtifactService {
     private final ArtifactRepository repository;
     private final FileStorageService fileStorageService;
     private final FileAttachmentsService fileAttachmentsService;
+    private final ArtifactAttachmentRepository attachmentRepository;
 
     public Page<Artifact> findAllWithFilters(XPage page, ArtifactsSearchCriteria searchCriteria) {
         Specification<Artifact> spec = Specification.where(ArtifactSpecifications.withShortSelect());
@@ -112,49 +114,48 @@ public class ArtifactService {
     }
 
     @Transactional
-    public void changePreview(Long id, MultipartFile preview) {
+    public void changePreview(Long id, Long imageId) {
         Artifact artifact = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
-        List<ArtifactAttachment> artifactAttachments = artifact.getImages();
-
-        ArtifactAttachment oldPreview =
-                artifactAttachments
-                        .stream()
-                        .filter(ArtifactAttachment::isPreview)
-                        .findFirst().orElse(null);
-
-        if (oldPreview != null) {
-            artifactAttachments.remove(oldPreview);
-            oldPreview.setArtifact(null);
-            fileAttachmentsService.delete(oldPreview.getFileAttachment());
+        if (attachmentRepository.existsById(imageId)) {
+            throw new EntityNotFoundException();
         }
 
-        FileAttachment fileAttachment =
-                fileAttachmentsService.saveFile(preview);
+        ArtifactAttachment oldPreview = findPreview(artifact);
+        if (oldPreview != null) {
+            attachmentRepository.unsetAsPreview(oldPreview.getId());
+        }
 
-        artifactAttachments.add(
-                new ArtifactAttachment(
-                        true,
-                        artifact,
-                        fileAttachment
-                )
-        );
+        attachmentRepository.setAsPreview(imageId);
 
         repository.save(artifact);
     }
 
     @Transactional
-    public void addImage(Long id, MultipartFile image) {
+    public void addImage(Long id, MultipartFile image, Boolean isPreview) {
         Artifact artifact = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
+        isPreview = isPreview != null ? isPreview : false;
+        if (isPreview) {
+            ArtifactAttachment oldPreview = findPreview(artifact);
+            attachmentRepository.unsetAsPreview(oldPreview.getId());
+        }
+
         FileAttachment fileAttachment = fileAttachmentsService.saveFile(image);
-        ArtifactAttachment artifactAttachment = new ArtifactAttachment(false, artifact, fileAttachment);
+        ArtifactAttachment artifactAttachment = new ArtifactAttachment(isPreview, artifact, fileAttachment);
 
         artifact.getImages().add(artifactAttachment);
 
         repository.save(artifact);
+    }
+
+    public ArtifactAttachment findPreview(Artifact artifact) {
+        return artifact.getImages().stream()
+                .filter(ArtifactAttachment::isPreview)
+                .findFirst()
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
@@ -162,15 +163,27 @@ public class ArtifactService {
         Artifact artifact = repository.findById(artifactId)
                 .orElseThrow(EntityNotFoundException::new);
 
-        ArtifactAttachment imageToRemove = artifact.getImages().stream()
+        deleteImage(artifact, imageId);
+
+        repository.save(artifact);
+    }
+
+    @Transactional
+    public void deleteImage(Artifact artifact, Long imageId) {
+        List<ArtifactAttachment> attachments = artifact.getImages();
+
+        ArtifactAttachment imageToRemove = attachments.stream()
                 .filter(image -> image.getId().equals(imageId))
                 .findFirst()
                 .orElseThrow(EntityNotFoundException::new);
 
+        deleteImage(artifact, imageToRemove);
+    }
+
+    @Transactional
+    public void deleteImage(Artifact artifact, ArtifactAttachment imageToRemove) {
         artifact.getImages().remove(imageToRemove);
         imageToRemove.setArtifact(null);
         fileAttachmentsService.delete(imageToRemove.getFileAttachment());
-
-        repository.save(artifact);
     }
 }
