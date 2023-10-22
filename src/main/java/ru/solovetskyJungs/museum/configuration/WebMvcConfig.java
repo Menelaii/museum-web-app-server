@@ -6,8 +6,8 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import ru.solovetskyJungs.museum.converters.ArtifactTypeConverter;
-import ru.solovetskyJungs.museum.converters.ValueCategoryConverter;
+import ru.solovetskyJungs.museum.mappers.converters.ArtifactTypeConverter;
+import ru.solovetskyJungs.museum.mappers.converters.ValueCategoryConverter;
 
 import java.io.File;
 

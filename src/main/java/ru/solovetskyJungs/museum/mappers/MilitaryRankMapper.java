@@ -3,11 +3,11 @@ package ru.solovetskyJungs.museum.mappers;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import ru.solovetskyJungs.museum.dto.MilitaryRankDTO;
-import ru.solovetskyJungs.museum.dto.MilitaryRankShortDTO;
-import ru.solovetskyJungs.museum.dto.MilitaryRankUploadDTO;
-import ru.solovetskyJungs.museum.entities.MilitaryRank;
-import ru.solovetskyJungs.museum.entities.projections.MilitaryRankProjection;
+import ru.solovetskyJungs.museum.models.dto.militaryRanks.MilitaryRankDTO;
+import ru.solovetskyJungs.museum.models.dto.militaryRanks.MilitaryRankShortDTO;
+import ru.solovetskyJungs.museum.models.dto.militaryRanks.MilitaryRankUploadDTO;
+import ru.solovetskyJungs.museum.models.entities.MilitaryRank;
+import ru.solovetskyJungs.museum.models.entities.projections.MilitaryRankProjection;
 
 import java.util.List;
 

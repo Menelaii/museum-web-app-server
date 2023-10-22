@@ -3,8 +3,8 @@ package ru.solovetskyJungs.museum.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.solovetskyJungs.museum.entities.Article;
-import ru.solovetskyJungs.museum.entities.projections.ArticleProjection;
+import ru.solovetskyJungs.museum.models.entities.Article;
+import ru.solovetskyJungs.museum.models.entities.projections.ArticleProjection;
 
 import java.util.List;
 

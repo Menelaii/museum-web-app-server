@@ -2,9 +2,8 @@ package ru.solovetskyJungs.museum.searchCriterias;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
-import ru.solovetskyJungs.museum.enums.ArtifactType;
-import ru.solovetskyJungs.museum.enums.ValueCategory;
+import ru.solovetskyJungs.museum.models.enums.ArtifactType;
+import ru.solovetskyJungs.museum.models.enums.ValueCategory;
 
 @Getter
 @Setter

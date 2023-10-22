@@ -3,11 +3,11 @@ package ru.solovetskyJungs.museum.mappers;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import ru.solovetskyJungs.museum.dto.MedalDTO;
-import ru.solovetskyJungs.museum.dto.MedalShortDTO;
-import ru.solovetskyJungs.museum.dto.MedalUploadDTO;
-import ru.solovetskyJungs.museum.entities.Medal;
-import ru.solovetskyJungs.museum.entities.projections.MedalProjection;
+import ru.solovetskyJungs.museum.models.dto.medals.MedalDTO;
+import ru.solovetskyJungs.museum.models.dto.medals.MedalShortDTO;
+import ru.solovetskyJungs.museum.models.dto.medals.MedalUploadDTO;
+import ru.solovetskyJungs.museum.models.entities.Medal;
+import ru.solovetskyJungs.museum.models.entities.projections.MedalProjection;
 
 import java.util.List;
 

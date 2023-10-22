@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.solovetskyJungs.museum.dto.AuthRequestDTO;
-import ru.solovetskyJungs.museum.dto.AuthResponseDTO;
-import ru.solovetskyJungs.museum.dto.RegistrationRequestDTO;
-import ru.solovetskyJungs.museum.entities.Account;
+import ru.solovetskyJungs.museum.models.dto.auth.AuthRequestDTO;
+import ru.solovetskyJungs.museum.models.dto.auth.AuthResponseDTO;
+import ru.solovetskyJungs.museum.models.dto.auth.RegistrationRequestDTO;
+import ru.solovetskyJungs.museum.models.entities.Account;
 import ru.solovetskyJungs.museum.security.JWTUtil;
 import ru.solovetskyJungs.museum.services.RegistrationService;
 

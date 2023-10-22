@@ -4,8 +4,8 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-import ru.solovetskyJungs.museum.entities.*;
-import ru.solovetskyJungs.museum.enums.CareerType;
+import ru.solovetskyJungs.museum.models.entities.*;
+import ru.solovetskyJungs.museum.models.enums.CareerType;
 
 import java.time.LocalDate;
 

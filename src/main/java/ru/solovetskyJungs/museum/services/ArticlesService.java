@@ -2,14 +2,12 @@ package ru.solovetskyJungs.museum.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.solovetskyJungs.museum.dto.ArticleShortDTO;
-import ru.solovetskyJungs.museum.entities.Article;
-import ru.solovetskyJungs.museum.entities.FileAttachment;
-import ru.solovetskyJungs.museum.entities.projections.ArticleProjection;
+import ru.solovetskyJungs.museum.models.entities.Article;
+import ru.solovetskyJungs.museum.models.entities.FileAttachment;
+import ru.solovetskyJungs.museum.models.entities.projections.ArticleProjection;
 import ru.solovetskyJungs.museum.mappers.ArticlesMapper;
 import ru.solovetskyJungs.museum.repositories.ArticlesRepository;
 import ru.solovetskyJungs.museum.searchCriterias.ArticlesSearchCriteria;
@@ -24,7 +22,7 @@ import java.util.List;
 public class ArticlesService {
     private final ArticlesRepository repository;
     private final FileStorageService fileStorageService;
-    private final FileAttachmentService fileAttachmentService;
+    private final FileAttachmentsService fileAttachmentsService;
     private final ArticlesMapper articlesMapper;
 
     public List<Article> findAllWithFilters(XPage page, ArticlesSearchCriteria searchCriteria) {
@@ -55,7 +53,7 @@ public class ArticlesService {
 
     @Transactional
     public void create(Article article, MultipartFile preview) {
-        FileAttachment previewAttachment = fileAttachmentService.saveFile(preview);
+        FileAttachment previewAttachment = fileAttachmentsService.saveFile(preview);
         article.setPreview(previewAttachment);
 
         article.setPublishDate(LocalDate.now());
@@ -78,5 +76,31 @@ public class ArticlesService {
         }
 
         return page * itemsPerPage;
+    }
+
+    @Transactional
+    public void edit(Long id, Article updated) {
+        Article article = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        article.setTitle(updated.getTitle());
+        article.setContent(updated.getContent());
+
+        repository.save(article);
+    }
+
+    @Transactional
+    public void changePreview(Long id, MultipartFile preview) {
+        Article article = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        fileAttachmentsService.delete(article.getPreview());
+
+        FileAttachment fileAttachment =
+                fileAttachmentsService.saveFile(preview);
+
+        article.setPreview(fileAttachment);
+
+        repository.save(article);
     }
 }

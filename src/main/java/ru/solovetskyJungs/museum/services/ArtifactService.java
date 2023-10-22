@@ -10,11 +10,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.solovetskyJungs.museum.entities.Artifact;
-import ru.solovetskyJungs.museum.entities.ArtifactAttachment;
-import ru.solovetskyJungs.museum.entities.FileAttachment;
-import ru.solovetskyJungs.museum.enums.ArtifactType;
-import ru.solovetskyJungs.museum.enums.ValueCategory;
+import ru.solovetskyJungs.museum.models.entities.Artifact;
+import ru.solovetskyJungs.museum.models.entities.ArtifactAttachment;
+import ru.solovetskyJungs.museum.models.entities.FileAttachment;
+import ru.solovetskyJungs.museum.models.enums.ArtifactType;
+import ru.solovetskyJungs.museum.models.enums.ValueCategory;
 import ru.solovetskyJungs.museum.repositories.ArtifactRepository;
 import ru.solovetskyJungs.museum.searchCriterias.ArtifactsSearchCriteria;
 import ru.solovetskyJungs.museum.searchCriterias.XPage;
@@ -22,7 +22,6 @@ import ru.solovetskyJungs.museum.specifications.ArtifactSpecifications;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 public class ArtifactService {
     private final ArtifactRepository repository;
     private final FileStorageService fileStorageService;
-    private final FileAttachmentService fileAttachmentService;
+    private final FileAttachmentsService fileAttachmentsService;
 
     public Page<Artifact> findAllWithFilters(XPage page, ArtifactsSearchCriteria searchCriteria) {
         Specification<Artifact> spec = Specification.where(ArtifactSpecifications.withShortSelect());
@@ -53,9 +52,7 @@ public class ArtifactService {
 
         Page<Artifact> artifacts = repository.findAll(spec, pageable);
 
-        artifacts.forEach(artifact -> {
-            Hibernate.initialize(artifact.getImages());
-        });
+        artifacts.forEach(artifact -> Hibernate.initialize(artifact.getImages()));
 
         return artifacts;
     }
@@ -69,11 +66,11 @@ public class ArtifactService {
     public void create(Artifact artifact, List<MultipartFile> images, MultipartFile preview) {
         List<ArtifactAttachment> artifactAttachments = new ArrayList<>();
 
-        FileAttachment previewAttachment = fileAttachmentService.saveFile(preview);
+        FileAttachment previewAttachment = fileAttachmentsService.saveFile(preview);
         artifactAttachments.add(new ArtifactAttachment(true, artifact, previewAttachment));
 
         if (images != null && !images.isEmpty()) {
-            List<FileAttachment> attachments = fileAttachmentService.saveFiles(images);
+            List<FileAttachment> attachments = fileAttachmentsService.saveFiles(images);
             artifactAttachments.addAll(attachments
                     .stream()
                     .map(el -> new ArtifactAttachment(false, artifact, el))
@@ -99,5 +96,81 @@ public class ArtifactService {
         fileStorageService.deleteFiles(paths);
 
         repository.delete(artifactToDelete);
+    }
+
+    @Transactional
+    public void edit(Long id, Artifact updatedArtifact) {
+        Artifact artifact = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        artifact.setTitle(updatedArtifact.getTitle());
+        artifact.setCreationPeriod(updatedArtifact.getCreationPeriod());
+        artifact.setType(updatedArtifact.getType());
+        artifact.setValueCategory(updatedArtifact.getValueCategory());
+
+        repository.save(artifact);
+    }
+
+    @Transactional
+    public void changePreview(Long id, MultipartFile preview) {
+        Artifact artifact = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        List<ArtifactAttachment> artifactAttachments = artifact.getImages();
+
+        ArtifactAttachment oldPreview =
+                artifactAttachments
+                        .stream()
+                        .filter(ArtifactAttachment::isPreview)
+                        .findFirst().orElse(null);
+
+        if (oldPreview != null) {
+            artifactAttachments.remove(oldPreview);
+            oldPreview.setArtifact(null);
+            fileAttachmentsService.delete(oldPreview.getFileAttachment());
+        }
+
+        FileAttachment fileAttachment =
+                fileAttachmentsService.saveFile(preview);
+
+        artifactAttachments.add(
+                new ArtifactAttachment(
+                        true,
+                        artifact,
+                        fileAttachment
+                )
+        );
+
+        repository.save(artifact);
+    }
+
+    @Transactional
+    public void addImage(Long id, MultipartFile image) {
+        Artifact artifact = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        FileAttachment fileAttachment = fileAttachmentsService.saveFile(image);
+        ArtifactAttachment artifactAttachment = new ArtifactAttachment(false, artifact, fileAttachment);
+
+        artifact.getImages().add(artifactAttachment);
+
+        repository.save(artifact);
+    }
+
+    @Transactional
+    public void deleteImage(Long artifactId, Long imageId) {
+        Artifact artifact = repository.findById(artifactId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        ArtifactAttachment imageToRemove = artifact.getImages().stream()
+                .filter(image -> image.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(EntityNotFoundException::new);
+
+        artifact.getImages().remove(imageToRemove);
+        imageToRemove.setArtifact(null);
+        fileAttachmentsService.delete(imageToRemove.getFileAttachment());
+
+        repository.save(artifact);
     }
 }

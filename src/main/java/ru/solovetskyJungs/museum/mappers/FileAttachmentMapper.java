@@ -3,11 +3,11 @@ package ru.solovetskyJungs.museum.mappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.solovetskyJungs.museum.dto.ImageAttachmentDTO;
-import ru.solovetskyJungs.museum.dto.FileAttachmentDTO;
-import ru.solovetskyJungs.museum.entities.ArtifactAttachment;
-import ru.solovetskyJungs.museum.entities.BiographyAttachment;
-import ru.solovetskyJungs.museum.entities.FileAttachment;
+import ru.solovetskyJungs.museum.models.dto.fileAttachmets.ImageAttachmentDTO;
+import ru.solovetskyJungs.museum.models.dto.fileAttachmets.FileAttachmentDTO;
+import ru.solovetskyJungs.museum.models.entities.ArtifactAttachment;
+import ru.solovetskyJungs.museum.models.entities.BiographyAttachment;
+import ru.solovetskyJungs.museum.models.entities.FileAttachment;
 
 import java.nio.file.Path;
 

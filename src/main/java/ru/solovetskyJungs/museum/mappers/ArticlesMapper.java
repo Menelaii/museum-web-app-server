@@ -3,12 +3,12 @@ package ru.solovetskyJungs.museum.mappers;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import ru.solovetskyJungs.museum.dto.ArticleDTO;
-import ru.solovetskyJungs.museum.dto.ArticleShortDTO;
-import ru.solovetskyJungs.museum.dto.ArticleUploadDTO;
-import ru.solovetskyJungs.museum.entities.Article;
-import ru.solovetskyJungs.museum.entities.FileAttachment;
-import ru.solovetskyJungs.museum.entities.projections.ArticleProjection;
+import ru.solovetskyJungs.museum.models.dto.articles.ArticleDTO;
+import ru.solovetskyJungs.museum.models.dto.articles.ArticleShortDTO;
+import ru.solovetskyJungs.museum.models.dto.articles.ArticleUploadDTO;
+import ru.solovetskyJungs.museum.models.entities.Article;
+import ru.solovetskyJungs.museum.models.entities.FileAttachment;
+import ru.solovetskyJungs.museum.models.entities.projections.ArticleProjection;
 
 @Component
 @RequiredArgsConstructor

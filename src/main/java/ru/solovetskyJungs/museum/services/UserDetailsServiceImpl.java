@@ -6,14 +6,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.solovetskyJungs.museum.entities.Account;
+import ru.solovetskyJungs.museum.models.entities.Account;
 import ru.solovetskyJungs.museum.repositories.AccountsRepository;
 import ru.solovetskyJungs.museum.security.UserDetailsImpl;
 
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final AccountsRepository repository;

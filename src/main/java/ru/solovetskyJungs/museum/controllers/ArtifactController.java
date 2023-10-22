@@ -6,12 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.solovetskyJungs.museum.dto.ArtifactDTO;
-import ru.solovetskyJungs.museum.dto.ArtifactShortDTO;
-import ru.solovetskyJungs.museum.dto.ArtifactUploadDTO;
-import ru.solovetskyJungs.museum.dto.PageDTO;
-import ru.solovetskyJungs.museum.entities.Artifact;
 import ru.solovetskyJungs.museum.mappers.ArtifactMapper;
+import ru.solovetskyJungs.museum.models.dto.ArtifactShortDTO;
+import ru.solovetskyJungs.museum.models.dto.ArtifactUploadDTO;
+import ru.solovetskyJungs.museum.models.dto.PageDTO;
+import ru.solovetskyJungs.museum.models.dto.articles.ArtifactDTO;
+import ru.solovetskyJungs.museum.models.entities.Artifact;
 import ru.solovetskyJungs.museum.searchCriterias.ArtifactsSearchCriteria;
 import ru.solovetskyJungs.museum.searchCriterias.XPage;
 import ru.solovetskyJungs.museum.services.ArtifactService;
@@ -24,7 +24,6 @@ import java.util.List;
 public class ArtifactController {
     private final ArtifactService service;
     private final ArtifactMapper artifactMapper;
-
 
     @GetMapping
     public ResponseEntity<PageDTO<ArtifactShortDTO>> getAll(XPage page, ArtifactsSearchCriteria searchCriteria) {
@@ -63,6 +62,37 @@ public class ArtifactController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteArtifact(@PathVariable Long id) {
         service.deleteArtifact(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> edit(@PathVariable Long id,
+                                     @RequestBody ArtifactUploadDTO uploadDTO
+    ) {
+        Artifact artifact = artifactMapper.map(uploadDTO);
+        service.edit(id, artifact);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> changePreview(@PathVariable Long id,
+                                              @RequestBody MultipartFile preview
+    ) {
+        service.changePreview(id, preview);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/add-image")
+    public ResponseEntity<Void> addImage(@PathVariable Long id,
+                                         @RequestParam("image") MultipartFile image) {
+        service.addImage(id, image);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{artifactId}/delete-image/{imageId}")
+    public ResponseEntity<Void> deleteImage(@PathVariable Long artifactId,
+                                            @PathVariable Long imageId) {
+        service.deleteImage(artifactId, imageId);
         return ResponseEntity.ok().build();
     }
 }

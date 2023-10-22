@@ -4,9 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.solovetskyJungs.museum.entities.Biography;
-import ru.solovetskyJungs.museum.entities.Medal;
-import ru.solovetskyJungs.museum.entities.MedalDetails;
+import ru.solovetskyJungs.museum.models.entities.Medal;
+import ru.solovetskyJungs.museum.models.entities.MedalDetails;
 import ru.solovetskyJungs.museum.repositories.MedalDetailsRepository;
 
 import java.util.ArrayList;
@@ -19,15 +18,9 @@ public class MedalDetailsService {
     private final MedalDetailsRepository repository;
     private final MedalService medalService;
 
-    public List<MedalDetails> getAll() {
-        return repository.findAll();
-    }
-
     @Transactional
     public MedalDetails save(MedalDetails medalDetails) {
-        Medal medal = medalService
-                .getById(medalDetails.getMedal().getId())
-                .orElseThrow(EntityNotFoundException::new);
+        Medal medal = medalService.getById(medalDetails.getMedal().getId());
 
         MedalDetails entity = repository.save(medalDetails);
         entity.setMedal(medal);

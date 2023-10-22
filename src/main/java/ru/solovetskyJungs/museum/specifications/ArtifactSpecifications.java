@@ -1,13 +1,10 @@
 package ru.solovetskyJungs.museum.specifications;
 
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import org.hibernate.Hibernate;
 import org.springframework.data.jpa.domain.Specification;
-import ru.solovetskyJungs.museum.entities.Artifact;
-import ru.solovetskyJungs.museum.entities.ArtifactAttachment;
-import ru.solovetskyJungs.museum.enums.ArtifactType;
-import ru.solovetskyJungs.museum.enums.ValueCategory;
+import ru.solovetskyJungs.museum.models.entities.Artifact;
+import ru.solovetskyJungs.museum.models.enums.ArtifactType;
+import ru.solovetskyJungs.museum.models.enums.ValueCategory;
 
 public class ArtifactSpecifications {
     public static Specification<Artifact> withTitle(String title) {

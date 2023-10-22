@@ -3,8 +3,8 @@ package ru.solovetskyJungs.museum.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import ru.solovetskyJungs.museum.entities.CareerDetails;
-import ru.solovetskyJungs.museum.enums.CareerType;
+import ru.solovetskyJungs.museum.models.entities.CareerDetails;
+import ru.solovetskyJungs.museum.models.enums.CareerType;
 
 import java.util.List;
 

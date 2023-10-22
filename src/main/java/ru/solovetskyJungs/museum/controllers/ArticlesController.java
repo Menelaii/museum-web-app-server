@@ -5,11 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.solovetskyJungs.museum.dto.ArticleDTO;
-import ru.solovetskyJungs.museum.dto.ArticleShortDTO;
-import ru.solovetskyJungs.museum.dto.ArticleUploadDTO;
-import ru.solovetskyJungs.museum.dto.PageDTO;
-import ru.solovetskyJungs.museum.entities.Article;
+import ru.solovetskyJungs.museum.models.dto.articles.ArticleDTO;
+import ru.solovetskyJungs.museum.models.dto.articles.ArticleShortDTO;
+import ru.solovetskyJungs.museum.models.dto.articles.ArticleUploadDTO;
+import ru.solovetskyJungs.museum.models.dto.PageDTO;
+import ru.solovetskyJungs.museum.models.entities.Article;
 import ru.solovetskyJungs.museum.mappers.ArticlesMapper;
 import ru.solovetskyJungs.museum.searchCriterias.ArticlesSearchCriteria;
 import ru.solovetskyJungs.museum.searchCriterias.XPage;
@@ -76,6 +76,19 @@ public class ArticlesController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteArtifact(@PathVariable Long id) {
         service.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> edit(@PathVariable Long id, @RequestBody ArticleUploadDTO uploadDTO) {
+        Article article = articlesMapper.map(uploadDTO);
+        service.edit(id, article);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> changePreview(@PathVariable Long id, @RequestBody MultipartFile preview) {
+        service.changePreview(id, preview);
         return ResponseEntity.ok().build();
     }
 }

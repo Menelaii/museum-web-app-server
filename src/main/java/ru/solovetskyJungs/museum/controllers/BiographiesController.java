@@ -6,12 +6,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.solovetskyJungs.museum.dto.*;
+import ru.solovetskyJungs.museum.mappers.BiographyMapper;
+import ru.solovetskyJungs.museum.models.dto.PageDTO;
+import ru.solovetskyJungs.museum.models.dto.biographies.BiographyDTO;
+import ru.solovetskyJungs.museum.models.dto.biographies.BiographyShortDTO;
+import ru.solovetskyJungs.museum.models.dto.biographies.BiographyUploadDTO;
+import ru.solovetskyJungs.museum.models.entities.Biography;
 import ru.solovetskyJungs.museum.searchCriterias.BiographySearchCriteria;
 import ru.solovetskyJungs.museum.searchCriterias.XPage;
 import ru.solovetskyJungs.museum.services.BiographiesService;
-import ru.solovetskyJungs.museum.entities.Biography;
-import ru.solovetskyJungs.museum.mappers.BiographyMapper;
 
 import java.util.List;
 
@@ -55,6 +58,44 @@ public class BiographiesController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> edit(@PathVariable Long id,
+                                     @RequestBody BiographyUploadDTO uploadDTO
+    ) {
+        Biography biography = biographyMapper.map(uploadDTO);
+        service.edit(id, biography);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/replace-presentation")
+    public ResponseEntity<Void> editPresentation(@PathVariable Long id,
+                                                 @RequestBody MultipartFile presentation
+    ) {
+        service.editPresentation(id, presentation);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/add-image")
+    public ResponseEntity<Void> addImage(@PathVariable Long id,
+                                         @RequestBody MultipartFile image) {
+        service.addImage(id, image);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{biographyId}/delete-image/{imageId}")
+    public ResponseEntity<Void> deleteImage(@PathVariable Long biographyId,
+                                            @PathVariable Long imageId) {
+        service.deleteImage(biographyId, imageId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/change-preview")
+    public ResponseEntity<Void> changePreview(@PathVariable Long id,
+                                              @RequestBody MultipartFile preview) {
+        service.changePreview(id, preview);
         return ResponseEntity.ok().build();
     }
 }

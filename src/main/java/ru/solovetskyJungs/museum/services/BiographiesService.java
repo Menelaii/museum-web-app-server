@@ -10,10 +10,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.solovetskyJungs.museum.entities.Biography;
-import ru.solovetskyJungs.museum.entities.BiographyAttachment;
-import ru.solovetskyJungs.museum.entities.FileAttachment;
-import ru.solovetskyJungs.museum.enums.CareerType;
+import ru.solovetskyJungs.museum.models.entities.Biography;
+import ru.solovetskyJungs.museum.models.entities.BiographyAttachment;
+import ru.solovetskyJungs.museum.models.entities.FileAttachment;
+import ru.solovetskyJungs.museum.models.enums.CareerType;
 import ru.solovetskyJungs.museum.repositories.BiographyRepository;
 import ru.solovetskyJungs.museum.repositories.CareerDetailsRepository;
 import ru.solovetskyJungs.museum.searchCriterias.BiographySearchCriteria;
@@ -22,18 +22,13 @@ import ru.solovetskyJungs.museum.specifications.BiographySpecifications;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.*;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BiographiesService {
     private final BiographyRepository repository;
-    private final FileAttachmentService fileAttachmentService;
-    private final MedalDetailsService medalDetailsService;
-    private final MilitaryRankDetailsService militaryRankDetailsService;
+    private final FileAttachmentsService fileAttachmentsService;
     private final CareerDetailsRepository careerDetailsRepository;
 
     public Biography getById(Long biographyId) {
@@ -112,62 +107,130 @@ public class BiographiesService {
     }
 
     @Transactional
-    public void save(Biography biography,
-                     List<MultipartFile> images,
-                     MultipartFile preview,
-                     MultipartFile presentation) {
-
-        biography.setMedalDetails(
-                medalDetailsService.save(biography.getMedalDetails())
-        );
-
-        biography.setMilitaryRankDetails(
-                militaryRankDetailsService.save(biography.getMilitaryRankDetails())
-        );
-
+    public void save(Biography biography, List<MultipartFile> images, MultipartFile preview, MultipartFile presentation) {
         List<BiographyAttachment> biographyAttachments = new ArrayList<>();
 
-        FileAttachment previewAttachment = fileAttachmentService.saveFile(preview);
+        FileAttachment previewAttachment = fileAttachmentsService.saveFile(preview);
         biographyAttachments.add(new BiographyAttachment(true, biography, previewAttachment));
 
         if (images != null && !images.isEmpty()) {
-            List<FileAttachment> attachments = fileAttachmentService.saveFiles(images);
-            biographyAttachments.addAll(attachments
-                    .stream()
-                    .map(el -> new BiographyAttachment(false, biography, el))
-                    .toList());
+            List<FileAttachment> attachments = fileAttachmentsService.saveFiles(images);
+            biographyAttachments.addAll(
+                    attachments.stream()
+                            .map(el -> new BiographyAttachment(false, biography, el))
+                            .toList()
+            );
         }
 
         biography.setImages(biographyAttachments);
 
         if (presentation != null) {
-            FileAttachment presentationAttachment = fileAttachmentService.saveFile(presentation);
+            FileAttachment presentationAttachment = fileAttachmentsService.saveFile(presentation);
             biography.setPresentation(presentationAttachment);
         }
 
-        if (biography.getMilitaryServiceDetails() != null) {
-            biography.getMilitaryServiceDetails().forEach(d -> {
-                d.setBiography(biography);
-                d.setCareerType(CareerType.MILITARY_SERVICE);
-            });
-        }
-
-        if (biography.getEmploymentHistory() != null) {
-            biography.getEmploymentHistory().forEach(d -> {
-                d.setBiography(biography);
-                d.setCareerType(CareerType.EMPLOYMENT_HISTORY);
-            });
-        }
-
-        Biography entity = repository.save(biography);
-
-        biography.getMedalDetails().forEach((d) -> d.setBiography(entity));
-        biography.getMilitaryRankDetails().forEach((d) -> d.setBiography(entity));
+        repository.save(biography);
     }
 
     @Transactional
     public void delete(Long id) {
         repository.findById(id).orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public void editPresentation(Long id, MultipartFile presentation) {
+        Biography biography = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        FileAttachment oldPresentation = biography.getPresentation();
+        if (oldPresentation != null) {
+            fileAttachmentsService.delete(oldPresentation);
+        }
+
+        FileAttachment newPresentation = fileAttachmentsService.saveFile(presentation);
+        biography.setPresentation(newPresentation);
+
+        repository.save(biography);
+    }
+
+    @Transactional
+    public void addImage(Long id, MultipartFile image) {
+        Biography biography = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        FileAttachment fileAttachment = fileAttachmentsService.saveFile(image);
+        BiographyAttachment imageAttachment = new BiographyAttachment(false, biography, fileAttachment);
+
+        biography.getImages().add(imageAttachment);
+
+        repository.save(biography);
+    }
+
+    @Transactional
+    public void deleteImage(Long biographyId, Long imageId) {
+        Biography biography = repository.findById(biographyId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        BiographyAttachment imageToRemove = biography.getImages().stream()
+                .filter(image -> image.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(EntityNotFoundException::new);
+
+        biography.getImages().remove(imageToRemove);
+        imageToRemove.setBiography(null);
+        fileAttachmentsService.delete(imageToRemove.getFileAttachment());
+
+        repository.save(biography);
+    }
+
+    @Transactional
+    public void changePreview(Long id, MultipartFile preview) {
+        Biography biography = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        BiographyAttachment oldPreview = biography.getImages()
+                .stream()
+                .filter(BiographyAttachment::isPreview)
+                .findFirst()
+                .orElse(null);
+
+        if (oldPreview != null) {
+            biography.getImages().remove(oldPreview);
+            oldPreview.setBiography(null);
+            fileAttachmentsService.delete(oldPreview.getFileAttachment());
+        }
+
+        FileAttachment fileAttachment = fileAttachmentsService.saveFile(preview);
+        biography.getImages().add(new BiographyAttachment(
+                true,
+                biography,
+                fileAttachment
+        ));
+
+        repository.save(biography);
+    }
+
+
+    @Transactional
+    public void edit(Long id, Biography updatedBiography) {
+        Biography existingBiography = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        existingBiography.setSurname(updatedBiography.getSurname());
+        existingBiography.setName(updatedBiography.getName());
+        existingBiography.setPatronymic(updatedBiography.getPatronymic());
+        existingBiography.setBirthDate(updatedBiography.getBirthDate());
+        existingBiography.setPlaceOfBirth(updatedBiography.getPlaceOfBirth());
+        existingBiography.setDateOfDeath(updatedBiography.getDateOfDeath());
+        existingBiography.setPlaceOfDeath(updatedBiography.getPlaceOfDeath());
+
+        existingBiography.setMedalDetails(updatedBiography.getMedalDetails());
+        existingBiography.setMilitaryRankDetails(updatedBiography.getMilitaryRankDetails());
+
+        existingBiography.setMilitaryServiceDetails(updatedBiography.getMilitaryServiceDetails());
+        existingBiography.setEmploymentHistory(updatedBiography.getEmploymentHistory());
+
+        repository.save(existingBiography);
     }
 }

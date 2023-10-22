@@ -2,7 +2,7 @@ package ru.solovetskyJungs.museum.specifications;
 
 import jakarta.persistence.criteria.Expression;
 import org.springframework.data.jpa.domain.Specification;
-import ru.solovetskyJungs.museum.entities.Article;
+import ru.solovetskyJungs.museum.models.entities.Article;
 
 @Deprecated
 public class ArticlesSpecifications {

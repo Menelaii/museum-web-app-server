@@ -5,13 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.solovetskyJungs.museum.entities.FileAttachment;
-import ru.solovetskyJungs.museum.entities.Medal;
-import ru.solovetskyJungs.museum.entities.projections.MedalProjection;
+import ru.solovetskyJungs.museum.models.entities.FileAttachment;
+import ru.solovetskyJungs.museum.models.entities.Medal;
+import ru.solovetskyJungs.museum.models.entities.projections.MedalProjection;
 import ru.solovetskyJungs.museum.repositories.MedalRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -19,15 +18,20 @@ import java.util.Optional;
 public class MedalService {
     private final MedalRepository repository;
     private final FileStorageService fileStorageService;
-    private final FileAttachmentService fileAttachmentService;
+    private final FileAttachmentsService fileAttachmentsService;
 
     public List<Medal> getAll() {
         return repository.findAll();
     }
 
+    public Medal getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
     @Transactional
     public void create(Medal medal, MultipartFile image) {
-        FileAttachment fileAttachment = fileAttachmentService.saveFile(image);
+        FileAttachment fileAttachment = fileAttachmentsService.saveFile(image);
         medal.setImage(fileAttachment);
         repository.save(medal);
     }
@@ -44,8 +48,31 @@ public class MedalService {
         repository.delete(medalToDelete);
     }
 
-    public Optional<Medal> getById(Long medalId) {
-        return repository.findById(medalId);
+    @Transactional
+    public void edit(Long id, Medal updatedMedal) {
+        Medal medalToUpdate = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        medalToUpdate.setTitle(updatedMedal.getTitle());
+        medalToUpdate.setDescription(updatedMedal.getDescription());
+
+        repository.save(medalToUpdate);
+    }
+
+    @Transactional
+    public void changePreview(Long id, MultipartFile image) {
+        Medal medalToUpdate = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        FileAttachment preview = medalToUpdate.getImage();
+        if (preview != null) {
+            fileAttachmentsService.delete(preview);
+        }
+
+        FileAttachment newImage = fileAttachmentsService.saveFile(image);
+        medalToUpdate.setImage(newImage);
+
+        repository.save(medalToUpdate);
     }
 
     public List<String> getTitles() {

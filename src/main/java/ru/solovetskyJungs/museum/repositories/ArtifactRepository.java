@@ -1,13 +1,11 @@
 package ru.solovetskyJungs.museum.repositories;
 
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import ru.solovetskyJungs.museum.entities.Artifact;
+import ru.solovetskyJungs.museum.models.entities.Artifact;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
