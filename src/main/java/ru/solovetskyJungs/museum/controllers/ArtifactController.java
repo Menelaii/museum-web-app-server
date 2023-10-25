@@ -74,23 +74,22 @@ public class ArtifactController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Void> changePreview(@PathVariable Long id,
-                                              @RequestParam Long imageId
-    ) {
+    @PatchMapping(value = "/{id}/preview")
+    public ResponseEntity<Void> changePreview(@PathVariable Long id, @RequestParam Long imageId) {
         service.changePreview(id, imageId);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/add-image")
+    @PostMapping(value = "/{id}/images", consumes = "multipart/form-data")
     public ResponseEntity<Void> addImage(@PathVariable Long id,
-                                         @RequestBody MultipartFile image,
-                                         @RequestParam Boolean isPreview) {
+                                         @RequestPart("image") MultipartFile image,
+                                         @RequestParam("isPreview") Boolean isPreview
+    ) {
         service.addImage(id, image, isPreview);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{artifactId}/delete-image/{imageId}")
+    @DeleteMapping("/{artifactId}/images/{imageId}")
     public ResponseEntity<Void> deleteImage(@PathVariable Long artifactId,
                                             @PathVariable Long imageId) {
         service.deleteImage(artifactId, imageId);

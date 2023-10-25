@@ -31,7 +31,7 @@ public class MilitaryRankService {
 
     @Transactional
     public void save(MilitaryRank militaryRank, MultipartFile image) {
-        FileAttachment attachment = fileAttachmentsService.saveFile(image);
+        FileAttachment attachment = fileAttachmentsService.saveImage(image);
         militaryRank.setImage(attachment);
         repository.save(militaryRank);
     }
@@ -66,7 +66,7 @@ public class MilitaryRankService {
             fileAttachmentsService.delete(preview);
         }
 
-        FileAttachment newImage = fileAttachmentsService.saveFile(image);
+        FileAttachment newImage = fileAttachmentsService.saveImage(image);
         rankToUpdate.setImage(newImage);
 
         repository.save(rankToUpdate);

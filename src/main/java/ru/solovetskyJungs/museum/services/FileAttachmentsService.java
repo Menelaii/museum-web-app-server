@@ -17,13 +17,18 @@ public class FileAttachmentsService {
     private final FileStorageService fileStorageService;
     private final FileAttachmentsRepository repository;
 
-    public List<FileAttachment> saveFiles(List<MultipartFile> files) {
+    public List<FileAttachment> saveImages(List<MultipartFile> files) {
         List<FileAttachment> fileAttachments = new ArrayList<>();
         for (MultipartFile file: files) {
-            fileAttachments.add(saveFile(file));
+            fileAttachments.add(saveImage(file));
         }
 
         return fileAttachments;
+    }
+
+    public FileAttachment saveImage(MultipartFile file) {
+        String path = fileStorageService.saveImage(file);
+        return new FileAttachment(path);
     }
 
     public FileAttachment saveFile(MultipartFile file) {

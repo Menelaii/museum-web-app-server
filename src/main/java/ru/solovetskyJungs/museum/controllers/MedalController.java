@@ -64,9 +64,8 @@ public class MedalController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping(value = "/{id}/preview")
-    public ResponseEntity<Void> changePreview(@PathVariable("id") Long id,
-                                                 @RequestBody MultipartFile image) {
+    @PatchMapping(value = "/{id}/preview", consumes = "multipart/form-data")
+    public ResponseEntity<Void> changePreview(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
         service.changePreview(id, image);
         return ResponseEntity.ok().build();
     }

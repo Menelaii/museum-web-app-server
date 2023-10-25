@@ -70,31 +70,31 @@ public class BiographiesController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}/replace-presentation")
+    @PatchMapping(value = "/{id}/presentation", consumes = "multipart/form-data")
     public ResponseEntity<Void> editPresentation(@PathVariable Long id,
-                                                 @RequestBody MultipartFile presentation
+                                                 @RequestPart("presentation") MultipartFile presentation
     ) {
         service.editPresentation(id, presentation);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/add-image")
+    @PostMapping(value = "/{id}/images", consumes = "multipart/form-data")
     public ResponseEntity<Void> addImage(@PathVariable Long id,
-                                         @RequestBody MultipartFile image,
-                                         @RequestParam Boolean isPreview
+                                         @RequestPart("image") MultipartFile image,
+                                         @RequestParam("isPreview") Boolean isPreview
     ) {
         service.addImage(id, image, isPreview);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{biographyId}/delete-image/{imageId}")
+    @DeleteMapping("/{biographyId}/images/{imageId}")
     public ResponseEntity<Void> deleteImage(@PathVariable Long biographyId,
                                             @PathVariable Long imageId) {
         service.deleteImage(biographyId, imageId);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}/change-preview")
+    @PatchMapping("/{id}/preview")
     public ResponseEntity<Void> changePreview(@PathVariable Long id,
                                               @RequestParam Long imageId) {
         service.changePreview(id, imageId);

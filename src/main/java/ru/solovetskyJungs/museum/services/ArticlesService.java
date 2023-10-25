@@ -53,7 +53,7 @@ public class ArticlesService {
 
     @Transactional
     public void create(Article article, MultipartFile preview) {
-        FileAttachment previewAttachment = fileAttachmentsService.saveFile(preview);
+        FileAttachment previewAttachment = fileAttachmentsService.saveImage(preview);
         article.setPreview(previewAttachment);
 
         article.setPublishDate(LocalDate.now());
@@ -97,7 +97,7 @@ public class ArticlesService {
         fileAttachmentsService.delete(article.getPreview());
 
         FileAttachment fileAttachment =
-                fileAttachmentsService.saveFile(preview);
+                fileAttachmentsService.saveImage(preview);
 
         article.setPreview(fileAttachment);
 

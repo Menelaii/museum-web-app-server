@@ -68,11 +68,11 @@ public class ArtifactService {
     public void create(Artifact artifact, List<MultipartFile> images, MultipartFile preview) {
         List<ArtifactAttachment> artifactAttachments = new ArrayList<>();
 
-        FileAttachment previewAttachment = fileAttachmentsService.saveFile(preview);
+        FileAttachment previewAttachment = fileAttachmentsService.saveImage(preview);
         artifactAttachments.add(new ArtifactAttachment(true, artifact, previewAttachment));
 
         if (images != null && !images.isEmpty()) {
-            List<FileAttachment> attachments = fileAttachmentsService.saveFiles(images);
+            List<FileAttachment> attachments = fileAttachmentsService.saveImages(images);
             artifactAttachments.addAll(attachments
                     .stream()
                     .map(el -> new ArtifactAttachment(false, artifact, el))
@@ -143,7 +143,7 @@ public class ArtifactService {
             attachmentRepository.unsetAsPreview(oldPreview.getId());
         }
 
-        FileAttachment fileAttachment = fileAttachmentsService.saveFile(image);
+        FileAttachment fileAttachment = fileAttachmentsService.saveImage(image);
         ArtifactAttachment artifactAttachment = new ArtifactAttachment(isPreview, artifact, fileAttachment);
 
         artifact.getImages().add(artifactAttachment);

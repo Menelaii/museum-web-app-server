@@ -79,15 +79,17 @@ public class ArticlesController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping(value = "/{id}")
     public ResponseEntity<Void> edit(@PathVariable Long id, @RequestBody ArticleUploadDTO uploadDTO) {
         Article article = articlesMapper.map(uploadDTO);
         service.edit(id, article);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Void> changePreview(@PathVariable Long id, @RequestBody MultipartFile preview) {
+    @PatchMapping(value = "/{id}/preview", consumes = "multipart/form-data")
+    public ResponseEntity<Void> changePreview(@PathVariable Long id,
+                                              @RequestPart("image") MultipartFile preview
+    ) {
         service.changePreview(id, preview);
         return ResponseEntity.ok().build();
     }

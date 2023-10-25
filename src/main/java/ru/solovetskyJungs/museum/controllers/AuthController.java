@@ -28,7 +28,7 @@ public class AuthController {
     private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
 
-    @Value("${jwt.tokenExpiresIn}")
+    @Value("${jwt.token-expires-in}")
     private int tokenExpiresIn;
 
     @PostMapping("/sign-up")
