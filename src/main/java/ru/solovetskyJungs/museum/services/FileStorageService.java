@@ -23,6 +23,8 @@ import static java.nio.file.Paths.get;
 @Service
 public class FileStorageService {
     private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);
+    private static final String JPG_FORMAT = "jpg";
+    private static final String PNG_FORMAT = "png";
 
     @Value("${file.storage.directory}")
     private String storageDirectory;
@@ -51,12 +53,20 @@ public class FileStorageService {
         return path.toString();
     }
 
-    public String saveImage(MultipartFile multipartFile) {
-        String filename = UUID.randomUUID() + getFileExtension(multipartFile.getOriginalFilename());
+    public String saveAsJPG(MultipartFile multipartFile) {
+        return saveImage(multipartFile, JPG_FORMAT);
+    }
+
+    public String saveAsPNG(MultipartFile multipartFile) {
+        return saveImage(multipartFile, PNG_FORMAT);
+    }
+
+    public String saveImage(MultipartFile multipartFile, String outputFormat) {
+        String filename = UUID.randomUUID().toString();
         Path path = get(storageDirectory, filename).toAbsolutePath().normalize();
 
         try {
-            byte[] compressed = ImageCompressionUtil.compressImage(multipartFile, compressionQuality);
+            byte[] compressed = ImageCompressionUtil.compressImage(multipartFile, compressionQuality, outputFormat);
             Files.write(path, compressed, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException | RuntimeException e) {
             logger.error(e.getMessage());

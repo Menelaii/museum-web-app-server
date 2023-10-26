@@ -31,7 +31,7 @@ public class MedalService {
 
     @Transactional
     public void create(Medal medal, MultipartFile image) {
-        FileAttachment fileAttachment = fileAttachmentsService.saveImage(image);
+        FileAttachment fileAttachment = fileAttachmentsService.saveAsPNG(image);
         medal.setImage(fileAttachment);
         repository.save(medal);
     }
@@ -69,7 +69,7 @@ public class MedalService {
             fileAttachmentsService.delete(preview);
         }
 
-        FileAttachment newImage = fileAttachmentsService.saveImage(image);
+        FileAttachment newImage = fileAttachmentsService.saveAsPNG(image);
         medalToUpdate.setImage(newImage);
 
         repository.save(medalToUpdate);

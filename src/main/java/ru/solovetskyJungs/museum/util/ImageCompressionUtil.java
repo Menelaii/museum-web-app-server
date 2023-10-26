@@ -9,7 +9,11 @@ import java.io.InputStream;
 
 public class ImageCompressionUtil {
 
-    public static byte[] compressImage(MultipartFile sourceImage, float compressionQuality) throws IOException {
+    public static byte[] compressImage(
+            MultipartFile sourceImage,
+            float compressionQuality,
+            String outputFormat
+    ) throws IOException {
         if (!sourceImage.getContentType().startsWith("image")) {
             throw new IllegalStateException("Пожалуйста, загрузите изображение.");
         }
@@ -20,7 +24,7 @@ public class ImageCompressionUtil {
         Thumbnails.of(sourseImageInputStream)
                 .scale(1f)
                 .outputQuality(compressionQuality)
-                .outputFormat("jpg")
+                .outputFormat(outputFormat)
                 .toOutputStream(outputStream);
 
         byte[] bytes = outputStream.toByteArray();

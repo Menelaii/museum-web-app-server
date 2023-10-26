@@ -110,11 +110,11 @@ public class BiographiesService {
     public void save(Biography biography, List<MultipartFile> images, MultipartFile preview, MultipartFile presentation) {
         List<BiographyAttachment> biographyAttachments = new ArrayList<>();
 
-        FileAttachment previewAttachment = fileAttachmentsService.saveImage(preview);
+        FileAttachment previewAttachment = fileAttachmentsService.saveAsJPG(preview);
         biographyAttachments.add(new BiographyAttachment(true, biography, previewAttachment));
 
         if (images != null && !images.isEmpty()) {
-            List<FileAttachment> attachments = fileAttachmentsService.saveImages(images);
+            List<FileAttachment> attachments = fileAttachmentsService.saveImagesAsJPG(images);
             biographyAttachments.addAll(
                     attachments.stream()
                             .map(el -> new BiographyAttachment(false, biography, el))
@@ -148,7 +148,7 @@ public class BiographiesService {
             fileAttachmentsService.delete(oldPresentation);
         }
 
-        FileAttachment newPresentation = fileAttachmentsService.saveImage(presentation);
+        FileAttachment newPresentation = fileAttachmentsService.saveFile(presentation);
         biography.setPresentation(newPresentation);
 
         repository.save(biography);
@@ -165,7 +165,7 @@ public class BiographiesService {
             attachmentsRepository.unsetAsPreview(oldPreview.getId());
         }
 
-        FileAttachment fileAttachment = fileAttachmentsService.saveImage(image);
+        FileAttachment fileAttachment = fileAttachmentsService.saveAsJPG(image);
         BiographyAttachment imageAttachment = new BiographyAttachment(isPreview, biography, fileAttachment);
 
         biography.getImages().add(imageAttachment);
