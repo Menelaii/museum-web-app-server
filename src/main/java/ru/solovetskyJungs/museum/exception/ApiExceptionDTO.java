@@ -8,6 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ApiExceptionDTO {
-    private Exception exception;
-    private String message;
+    private String exception;
 }

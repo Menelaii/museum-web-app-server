@@ -75,8 +75,10 @@ public class ArtifactController {
     }
 
     @PatchMapping(value = "/{id}/preview")
-    public ResponseEntity<Void> changePreview(@PathVariable Long id, @RequestParam Long imageId) {
-        service.changePreview(id, imageId);
+    public ResponseEntity<Void> changePreview(@PathVariable Long id,
+                                              @RequestParam("previewId") Long attachmentId
+    ) {
+        service.changePreview(id, attachmentId);
         return ResponseEntity.ok().build();
     }
 
@@ -89,10 +91,10 @@ public class ArtifactController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{artifactId}/images/{imageId}")
+    @DeleteMapping("/{artifactId}/images/{attachmentId}")
     public ResponseEntity<Void> deleteImage(@PathVariable Long artifactId,
-                                            @PathVariable Long imageId) {
-        service.deleteImage(artifactId, imageId);
+                                            @PathVariable Long attachmentId) {
+        service.deleteImage(artifactId, attachmentId);
         return ResponseEntity.ok().build();
     }
 }

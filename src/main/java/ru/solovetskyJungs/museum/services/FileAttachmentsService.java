@@ -17,6 +17,12 @@ public class FileAttachmentsService {
     private final FileStorageService fileStorageService;
     private final FileAttachmentsRepository repository;
 
+    @Transactional
+    public void delete(FileAttachment fileAttachment) {
+        fileStorageService.deleteFile(fileAttachment.getUri());
+        repository.delete(fileAttachment);
+    }
+
     public List<FileAttachment> saveImagesAsJPG(List<MultipartFile> files) {
         List<FileAttachment> fileAttachments = new ArrayList<>();
         for (MultipartFile file: files) {
@@ -39,11 +45,5 @@ public class FileAttachmentsService {
     public FileAttachment saveFile(MultipartFile file) {
         String path = fileStorageService.save(file);
         return new FileAttachment(path);
-    }
-
-    @Transactional
-    public void delete(FileAttachment fileAttachment) {
-        fileStorageService.deleteFile(fileAttachment.getUri());
-        repository.delete(fileAttachment);
     }
 }

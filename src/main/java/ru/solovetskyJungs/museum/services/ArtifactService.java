@@ -23,6 +23,7 @@ import ru.solovetskyJungs.museum.specifications.ArtifactSpecifications;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -114,12 +115,15 @@ public class ArtifactService {
     }
 
     @Transactional
-    public void changePreview(Long id, Long imageId) {
+    public void changePreview(Long id, Long attachmentId) {
         Artifact artifact = repository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("Предмет не найден id = " + id));
+
+        ArtifactAttachment newPreview = attachmentRepository.findById(attachmentId)
                 .orElseThrow(EntityNotFoundException::new);
 
-        if (attachmentRepository.existsById(imageId)) {
-            throw new EntityNotFoundException();
+        if (!Objects.equals(newPreview.getArtifact(), artifact)) {
+            throw new IllegalStateException("Нельзя изменить вложение другого предмета");
         }
 
         ArtifactAttachment oldPreview = findPreview(artifact);
@@ -127,7 +131,7 @@ public class ArtifactService {
             attachmentRepository.unsetAsPreview(oldPreview.getId());
         }
 
-        attachmentRepository.setAsPreview(imageId);
+        attachmentRepository.setAsPreview(attachmentId);
 
         repository.save(artifact);
     }
@@ -140,7 +144,9 @@ public class ArtifactService {
         isPreview = isPreview != null ? isPreview : false;
         if (isPreview) {
             ArtifactAttachment oldPreview = findPreview(artifact);
-            attachmentRepository.unsetAsPreview(oldPreview.getId());
+            if (oldPreview != null) {
+                attachmentRepository.unsetAsPreview(oldPreview.getId());
+            }
         }
 
         FileAttachment fileAttachment = fileAttachmentsService.saveAsJPG(image);
@@ -155,35 +161,35 @@ public class ArtifactService {
         return artifact.getImages().stream()
                 .filter(ArtifactAttachment::isPreview)
                 .findFirst()
-                .orElseThrow(EntityNotFoundException::new);
+                .orElse(null);
     }
 
     @Transactional
-    public void deleteImage(Long artifactId, Long imageId) {
+    public void deleteImage(Long artifactId, Long attachmentId) {
         Artifact artifact = repository.findById(artifactId)
                 .orElseThrow(EntityNotFoundException::new);
 
-        deleteImage(artifact, imageId);
+        deleteImage(artifact, attachmentId);
 
         repository.save(artifact);
     }
 
     @Transactional
-    public void deleteImage(Artifact artifact, Long imageId) {
+    public void deleteImage(Artifact artifact, Long attachmentId) {
         List<ArtifactAttachment> attachments = artifact.getImages();
 
-        ArtifactAttachment imageToRemove = attachments.stream()
-                .filter(image -> image.getId().equals(imageId))
+        ArtifactAttachment attachmentToRemove = attachments.stream()
+                .filter(image -> image.getId().equals(attachmentId))
                 .findFirst()
                 .orElseThrow(EntityNotFoundException::new);
 
-        deleteImage(artifact, imageToRemove);
+        deleteImage(artifact, attachmentToRemove);
     }
 
     @Transactional
-    public void deleteImage(Artifact artifact, ArtifactAttachment imageToRemove) {
-        artifact.getImages().remove(imageToRemove);
-        imageToRemove.setArtifact(null);
-        fileAttachmentsService.delete(imageToRemove.getFileAttachment());
+    public void deleteImage(Artifact artifact, ArtifactAttachment attachmentToRemove) {
+        artifact.getImages().remove(attachmentToRemove);
+        attachmentToRemove.setArtifact(null);
+        fileAttachmentsService.delete(attachmentToRemove.getFileAttachment());
     }
 }

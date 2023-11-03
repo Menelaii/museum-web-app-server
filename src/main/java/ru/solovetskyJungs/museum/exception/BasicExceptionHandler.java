@@ -12,11 +12,10 @@ public class BasicExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiExceptionDTO> handle(Exception e) {
-        logger.error(e.toString() + " " + e.getMessage());
-
+        String exceptionLine = e.toString();
+        logger.error(exceptionLine);
         return ResponseEntity.badRequest().body(
-                new ApiExceptionDTO(e, e.getMessage()
-                )
+                new ApiExceptionDTO(exceptionLine)
         );
     }
 }

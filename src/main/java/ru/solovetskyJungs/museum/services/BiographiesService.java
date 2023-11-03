@@ -195,8 +195,8 @@ public class BiographiesService {
         Biography biography = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
-        if (attachmentsRepository.existsById(imageId)) {
-            throw new EntityNotFoundException();
+        if (!attachmentsRepository.existsById(imageId)) {
+            throw new EntityNotFoundException("Вложение не найдено");
         }
 
         BiographyAttachment oldPreview = findPreview(biography);
